@@ -77,6 +77,33 @@ The gate treats it as a story element, not a credential.
 
 ---
 
+
+## Identity model — detail
+
+The phrase is normalized (stripped, lowercased) and hashed with SHA-256.
+The resulting 256-bit digest serves as the player_id.
+
+Two users presenting the same phrase receive the same identity.
+This is by design: the phrase is a shared secret, not a personal token.
+If unique per-user identity is required, salt the phrase with a username at enrollment.
+
+## Enrollment
+
+The gate does not manage enrollment directly. A phrase becomes valid by registering
+its SHA-256 digest in the portal (the backing player registry).
+
+1. Author/operator calls the portal API: 
+2. The portal associates the player_id with a scene graph entry.
+3. The gate never sees the phrase — only the hash produced client-side.
+
+## Threat model
+
+Protects against: password database breach (only hashes stored), credential stuffing
+(phrase-space is continuous, not a fixed credential set), phishing text fields (none exist).
+
+Does not protect against: observer who knows the phrase and presents it verbatim,
+brute-force of short/common phrases (use 4+ uncommon words), server-side portal breach.
+
 ## Reference
 
 - Engine: https://foxtrot42.org/f42quest  
